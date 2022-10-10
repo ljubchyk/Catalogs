@@ -1,4 +1,5 @@
 ﻿using Catalogs.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalogs.Infrastructure
 {
@@ -19,6 +20,11 @@ namespace Catalogs.Infrastructure
         public Task<Product> Get(Guid id)
         {
             return db.FindAsync<Product>(id).AsTask();
+        }
+
+        public Task<Product[]> GetList(int offset = 0, int limit = 10)
+        {
+            return db.Products.Skip(offset).Take(limit).ToArrayAsync();
         }
 
         public void Remove(Product product)

@@ -9,7 +9,7 @@ namespace Catalogs.Infrastructure
         {
             var optionsBuilder = new DbContextOptionsBuilder<Db>();
             optionsBuilder.UseSqlServer(
-                "Server=.;Initial Catalog=Products;Integrated Security=true");
+                "Server=.;Initial Catalog=Catalog;Integrated Security=true");
 
             return new Db(optionsBuilder.Options);
         }
