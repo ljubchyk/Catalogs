@@ -1,3 +1,5 @@
+using Catalogs.Domain;
+
 namespace Catalogs
 {
     public class Program
@@ -21,6 +23,9 @@ namespace Catalogs
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            builder.Services.AddApplication(
+                builder.Configuration);
 
             app.UseHttpsRedirection();
 
