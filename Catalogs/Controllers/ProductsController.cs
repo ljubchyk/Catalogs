@@ -41,9 +41,16 @@ namespace Catalogs.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] Product product)
         {
-            await productApplication.Update(id, product);
-            
-            return Ok(product);
+            try
+            {
+                await productApplication.Update(id, product);
+                
+                return Ok(product);
+            }
+            catch
+            {
+                return NotFound();
+            }
         }
 
         [HttpDelete("{id}")]

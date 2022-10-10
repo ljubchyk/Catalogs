@@ -65,6 +65,7 @@ namespace Catalogs.Application
                 product.Image);
             productRepository.Add(domainProduct);
 
+            Map(product, domainProduct);
             return unitOfWork.Commit();
         }
 
