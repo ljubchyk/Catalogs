@@ -18,6 +18,7 @@ namespace Catalogs
             });
             serviceCollection.AddInfrastructure(
                 configuration.GetConnectionString("db"));
+            serviceCollection.AddScoped<Application.ProductApplicationService>();
         }
     }
 }
