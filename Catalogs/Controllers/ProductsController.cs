@@ -45,5 +45,13 @@ namespace Catalogs.Controllers
             
             return Ok(product);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Remove(Guid id)
+        {
+            await productApplication.Remove(id);
+
+            return Ok();
+        }
     }
 }
