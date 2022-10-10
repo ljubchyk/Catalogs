@@ -1,0 +1,29 @@
+﻿using Catalogs.Domain;
+
+namespace Catalogs.Infrastructure
+{
+    public class ProductRepository : IProductRepository
+    {
+        private readonly Db db;
+
+        public ProductRepository(Db db)
+        {
+            this.db = db;
+        }
+
+        public void Add(Product product)
+        {
+            db.Add(product);
+        }
+
+        public Task<Product> Get(Guid id)
+        {
+            return db.FindAsync<Product>(id).AsTask();
+        }
+
+        public void Remove(Product product)
+        {
+            db.Remove(product);
+        }
+    }
+}
