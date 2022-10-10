@@ -1,3 +1,4 @@
+using Catalogs.Application;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalogs.Controllers
@@ -6,15 +7,18 @@ namespace Catalogs.Controllers
     [Route("[controller]")]
     public class ProductsController : ControllerBase
     {
-        public ProductsController()
+        private readonly ProductApplicationService productApplication;
+
+        public ProductsController(ProductApplicationService productApplication)
         {
-            
+            this.productApplication = productApplication;
         }
 
         [HttpGet("{id}")]
-        public Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
-
+            var product = await productApplication.Get(id);
+            return Ok(product);
         }
     }
 }
