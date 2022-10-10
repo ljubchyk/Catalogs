@@ -5,10 +5,10 @@ namespace Catalogs.Domain
     public class Product : Entity
     {
         private readonly Guid id;
-        private readonly string name;
-        private readonly decimal price;
-        private readonly decimal cost;
-        private readonly string image;
+        private string name;
+        private decimal price;
+        private decimal cost;
+        private string image;
 
         private Product()
         {
@@ -51,5 +51,25 @@ namespace Catalogs.Domain
         public decimal Cost => cost;
         public string Image => image;
         public Guid Id => id;
+
+        public void Rename(string name)
+        {
+            this.name = name;
+        }
+
+        public void ChangePrice(decimal price)
+        {
+            this.price = price;
+        }
+
+        public void ChangeCost(decimal cost)
+        {
+            this.cost = cost;
+        }
+
+        public void ChangeImage(string image)
+        {
+            this.image = image;
+        }
     }
 }
