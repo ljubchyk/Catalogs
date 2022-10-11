@@ -1,6 +1,7 @@
 using Catalogs.Application;
 using Catalogs.Domain;
 using Catalogs.Infrastructure;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -8,7 +9,7 @@ namespace Catalogs.Tests.ProductApplication
 {
     public class CreateUnitTests
     {
-        private readonly ProductRepositoryFake repo;
+        private readonly IProductRepository repo;
         private readonly UnitOfWorkFake uow;
 
         private readonly ProductApplicationService productApplication;
@@ -22,7 +23,7 @@ namespace Catalogs.Tests.ProductApplication
         }
 
         [Fact]
-        public async Task Create_Creates()
+        public async Task Creates()
         {
             var product = new Application.Product
             {
@@ -47,7 +48,7 @@ namespace Catalogs.Tests.ProductApplication
         }
 
         [Fact]
-        public async Task Create_InitializeArgument()
+        public async Task InitializesArgument()
         {
             var product = new Application.Product
             {
@@ -65,6 +66,34 @@ namespace Catalogs.Tests.ProductApplication
             Assert.Equal("im", product.Image);
             Assert.Equal("n", product.Name);
             Assert.Equal(2, product.Price);
+        }
+
+        [Fact]
+        public async Task RaisesProductCreatedEvent()
+        {
+            var dbBuilder = new DbContextOptionsBuilder<Db>();
+            dbBuilder.UseInMemoryDatabase("DbTest");
+            var db = new Db(dbBuilder.Options);
+
+            var repo = new ProductRepository(db);
+            var bus = new BusFake();
+            var uow = new UnitOfWork(db, bus);
+            var productApplication = new ProductApplicationService(repo, uow);
+
+            var product = new Application.Product
+            {
+                Cost = 1,
+                Image = "im",
+                Name = "n",
+                Price = 2
+            };
+
+            await productApplication.Add(product);
+
+            var sentEvent = bus.GetSentMessage<ProductCreated>();
+            Assert.NotNull(sentEvent);
+            Assert.Equal(product.Id, sentEvent.Id);
+            Assert.Equal(product.Name, sentEvent.Name);
         }
     }
 }

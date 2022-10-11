@@ -1,4 +1,5 @@
 ﻿using Catalogs.Domain;
+using MassTransit;
 using MassTransit.Mediator;
 
 namespace Catalogs.Infrastructure
@@ -6,12 +7,12 @@ namespace Catalogs.Infrastructure
     public class UnitOfWork : IUnitOfWork
     {
         private readonly Db db;
-        private readonly IMediator mediator;
+        private readonly IBus bus;
 
-        public UnitOfWork(Db db, IMediator mediator)
+        public UnitOfWork(Db db, IBus bus)
         {
             this.db = db;
-            this.mediator = mediator;
+            this.bus = bus;
         }
 
         public async Task Commit()
@@ -23,7 +24,7 @@ namespace Catalogs.Infrastructure
             {
                 foreach (var domainEvent in ((Entity)entry.Entity).DomainEvents)
                 {
-                    mediator.Publish(domainEvent);
+                    bus.Publish(domainEvent);
                 }
             }
         }
