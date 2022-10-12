@@ -18,6 +18,10 @@ namespace Catalogs.Controllers
         public async Task<IActionResult> Get(Guid id)
         {
             var product = await productApplication.Get(id);
+            if (product is null)
+            {
+                return NotFound();
+            }
 
             return Ok(product);
         }
@@ -41,16 +45,9 @@ namespace Catalogs.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] Product product)
         {
-            try
-            {
-                await productApplication.Update(id, product);
-                
-                return Ok(product);
-            }
-            catch
-            {
-                return NotFound();
-            }
+            await productApplication.Update(id, product);
+
+            return Ok(product);
         }
 
         [HttpDelete("{id}")]
