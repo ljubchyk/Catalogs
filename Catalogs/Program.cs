@@ -14,6 +14,8 @@ namespace Catalogs
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddApplication(
+                builder.Configuration);
 
             var app = builder.Build();
 
@@ -23,9 +25,6 @@ namespace Catalogs
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
-            builder.Services.AddApplication(
-                builder.Configuration);
 
             app.UseHttpsRedirection();
 
