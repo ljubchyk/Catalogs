@@ -1,4 +1,5 @@
 using Catalogs.Application;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalogs.Controllers
@@ -7,25 +8,40 @@ namespace Catalogs.Controllers
     [Route("[controller]")]
     public class ProductsController : ControllerBase
     {
-        private readonly ProductApplicationService productApplication;
+        private readonly IMediator mediator;
 
-        public ProductsController(ProductApplicationService productApplication)
+        public ProductsController(IMediator mediator)
         {
-            this.productApplication = productApplication;
+            this.mediator = mediator;
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var product = await productApplication.Get(id);
+            var query = new GetProductQuery(id);
+            var domainProduct = await mediator.Send(query);
+            if (domainProduct is null)
+            {
+                return NotFound();
+            }
 
+            var product = new Product();
+            Map(domainProduct, product);
             return Ok(product);
         }
 
         [HttpGet()]
         public async Task<IActionResult> GetList([FromQuery] int offset = 0, [FromQuery] int limit = 10)
         {
-            var products = await productApplication.GetList(offset, limit);
+            var query = new GetProductsQuery(offset, limit);
+            var domainProducts = await mediator.Send(query);
+
+            var products = domainProducts.Select(dp =>
+            {
+                var product = new Product();
+                Map(dp, product);
+                return product;
+            }).ToArray();
 
             return Ok(products);
         }
@@ -33,32 +49,48 @@ namespace Catalogs.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] Product product)
         {
-            await productApplication.Add(product);
-            
+            var command = new CreateProductCommand(
+                product.Name,
+                product.Price,
+                product.Cost,
+                product.Image);
+            var domainProduct = await mediator.Send(command);
+
+            Map(domainProduct, product);
             return CreatedAtAction(nameof(Get), new { product.Id }, product);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] Product product)
         {
-            try
-            {
-                await productApplication.Update(id, product);
-                
-                return Ok(product);
-            }
-            catch
-            {
-                return NotFound();
-            }
+            var command = new UpdateProductCommand(
+                id,
+                product.Name,
+                product.Price,
+                product.Cost,
+                product.Image);
+            var domainProduct = await mediator.Send(command);
+
+            Map(domainProduct, product);
+            return Ok(product);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remove(Guid id)
         {
-            await productApplication.Remove(id);
+            var command = new RemoveProductCommand(id);
+            await mediator.Send(command);
 
             return Ok();
+        }
+
+        public static void Map(Domain.Product source, Product destination)
+        {
+            destination.Id = source.Id;
+            destination.Image = source.Image;
+            destination.Cost = source.Cost;
+            destination.Name = source.Name;
+            destination.Price = source.Price;
         }
     }
 }

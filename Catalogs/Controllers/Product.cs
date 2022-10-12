@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Catalogs.Application
+namespace Catalogs.Controllers
 {
     public class Product
     {
